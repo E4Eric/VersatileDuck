@@ -15,7 +15,7 @@ class R():
     def __str__(self):
         return f'({self.x},{self.y},{self.w},{self.h})'
 
-class QTPlatform(QtWidgets.QWidget): 
+class QTPlatform(QtWidgets.QWidget):
     def __init__(self, ctx):
         self.ctx = ctx
         self.fontCache = {}
@@ -53,19 +53,35 @@ class QTPlatform(QtWidgets.QWidget):
     def getImageHeight(self, pixmap):
         return pixmap.rect().height()
 
-    def getFontFromSpec(self, fontSpec: str):
+
+    def getFontFromSpec(self, fontSpec):
         if fontSpec in self.fontCache:
-            return self.fontCache[fontSpec].font()
+            font, palette = self.fontCache[fontSpec]
+            return font
 
-        # HACK! static for now...
-        if fontSpec == '':
-            fontSpec = "background-color: transparent; color: red; font: bold 18pt Arial;"
+        font = QFont()
 
-        label = QLabel()
-        label.setStyleSheet("QLabel {background-color: #A3C1DA; color: red;}")
-        self.fontCache[fontSpec] = label
+        # set transparent background in the palette
+        font.setStyleHint(QFont.SansSerif)  # default style hint
 
-        return label.font()
+        textColor = QColor(0,0,0,)
+        for attr, value in self.parseStyleSheet(fontSpec):
+            if attr == "font-family":
+                font.setFamily(value)
+            elif attr == "color":
+                textColor = QColor(value)
+            elif attr == "font-size":
+                font.setPointSize(int(value))
+            elif attr == "font-weight":
+                font.setWeight(int(value))
+            elif attr == "font-style":
+                if value == "italic":
+                    font.setItalic(True)
+                if value == "bold":
+                    font.setBold(True)
+
+        self.fontCache[fontSpec] = (font, textColor)
+        return font
 
     def parseStyleSheet(self, fontSpec: str):
         """
@@ -75,8 +91,8 @@ class QTPlatform(QtWidgets.QWidget):
         for rule in fontSpec.split(";"):
             if not rule:
                 continue
-            property, value = rule.split(":")
-            properties.append((property.strip(), value.strip()))
+            attr, value = rule.split(":")
+            properties.append((attr.strip(), value.strip()))
         return properties
 
     def getTextWidth(self, text, fontSpec):
@@ -92,8 +108,9 @@ class QTPlatform(QtWidgets.QWidget):
         return bounding_rect.height()
 
     def drawText(self, x, y, text, fontSpec):
-        font = self.getFontFromSpec(fontSpec)
+        font, textColor = self.fontCache[fontSpec]
         self.painter.setFont(font)
+        self.painter.setPen(QColor(textColor))
 
         print(x, y, text)
         r = QRect(x, y, 1000, 1000)
