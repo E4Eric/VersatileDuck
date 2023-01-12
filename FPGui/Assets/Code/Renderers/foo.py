@@ -1,16 +1,24 @@
 
 
 def draw(ctx, me):
-    print('draw label: ', me['label'])
     sd = ctx.getStyleData(me['style'])
 
     # Adjust the top/right for the style
     x = me['drawRect'].x + sd['lw'] + sd['rm']
     y = me['drawRect'].y + sd['th'] + sd['tm']
-    text = me['label']
 
-    fontSpec = ''
-    if 'fontSpec' in sd:
-        fontSpec = sd['fontSpec']
+    if 'icon' in me:
+        icon = ctx.getIconImage(me['icon'])
+        ctx.window.drawIcon(x, y, icon)
+        x += ctx.window.getImageWidth(icon)
+        if 'label' in me:
+            if 'labelGap' in sd:
+                x += sd['labelGap']
 
-    ctx.window.drawText(x, y, text, fontSpec)
+    if 'label' in me:
+        text = me['label']
+        fontSpec = ''
+        if 'fontSpec' in sd:
+            fontSpec = sd['fontSpec']
+
+        ctx.window.drawText(x, y, text, fontSpec)

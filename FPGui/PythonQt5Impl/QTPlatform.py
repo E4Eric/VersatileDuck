@@ -112,15 +112,17 @@ class QTPlatform(QtWidgets.QWidget):
         self.painter.setFont(font)
         self.painter.setPen(QColor(textColor))
 
-        print(x, y, text)
         r = QRect(x, y, 1000, 1000)
         self.painter.drawText(r, Qt.AlignTop | Qt.AlignLeft,  text)
 
-    def drawImage(self, dx,dy,dw,dh, image, sx,sy,sw,sh):
-        dstRect = QRect(dx,dy,dw,dh)
-        srcRect = QRect(sx,sy,sw,sh)
+    def drawIcon(self, x, y, image):
+        self.painter.drawPixmap(x, y, image)
+
+    def drawImage(self, dx, dy, dw, dh, image, sx, sy, sw, sh):
+        dstRect = QRect(dx, dy, dw, dh)
+        srcRect = QRect(sx, sy, sw, sh)
         self.painter.drawPixmap(srcRect, image, dstRect)
 
-    def crop(self, srcMap, x,y,w,h):
-        return srcMap.copy(QRect(x,y,w,h))
+    def crop(self, srcMap, x, y, w, h):
+        return srcMap.copy(QRect(x, y, w, h))
 

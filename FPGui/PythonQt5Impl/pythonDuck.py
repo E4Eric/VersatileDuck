@@ -27,22 +27,6 @@ class RuntimeContext():
         # First extract the style's image from the sheet
         styleImage = self.window.crop(sheetImage, spec['srcX'], spec['srcY'], spec['srcW'], spec['srcH'])
 
-        # Now dissect the style image into its component elements
-        # if spec['th'] > 0 && spec['lw'] > 0:   # top/Left corner
-        #     tlImage = self.window.crop(styleImage, 0, 0, spec['lw'], spec['th'])
-        #     self.imageCache[sheetName + '/' + name + '/tl'] = tlImage
-        # if spec['th'] > 0 && spec['lw'] > 0:   # top/right corner
-        #     offset = self.window.getImageWidth(styleImage) - spec['rw']
-        #     tlImage = self.window.crop(styleImage, offset, 0, spec['rw'], spec['th'])
-        #     self.imageCache[sheetName + '/' + name + 'tr'] = tlImage
-
-        # railWidth = self.window.getImageWidth(styleImage) - (spec['lw'] + spec['rw'])
-        # if railWidth > 0:
-        #     tlImage = self.window.crop(styleImage, spec['rw'], 0, railWidth, spec['th'])
-        #     self.imageCache[sheetName + '/' + name + 'tr'] = tlImage
-        #
-        # railHeight = self.window.getImageHeight(styleImage) - (spec['th'] + spec['bh'])
-
     def loadStyleSheets(self, stylesDir):
         styleSheetList = self.getJsonData(stylesDir)
         for styleSheet in styleSheetList:
@@ -64,6 +48,9 @@ class RuntimeContext():
         style = styleSheet['Styles'][styleName]
         styleImage = self.window.crop(sheetImage, style['srcX'], style['srcY'], style['srcW'], style['srcH'])
         return styleImage
+
+    def getIconImage(self, iconName):
+        return self.imageCache['Icon/' + iconName]
 
     def offsetModelElement(self, me, dx, dy):
         me['drawRect'].x += dx
@@ -95,14 +82,24 @@ class RuntimeContext():
         adjusted.h -= styleData['th'] + styleData['tm'] + styleData['bm'] + styleData['bh']
         return adjusted
 
-    def loadIcons(self, iconsDir):
-        iconData = self.getJsonData(iconsDir)
-        for icon in iconData:
-            self.iconCache[icon['name']] = icon
-            print("loaded Icon: ", icon['name'])
-            imagePath = iconsDir + '/' + icon['imagePath']
-            image = self.window.loadImage(imagePath)
-            self.cacheImage("Icon/" + icon['name'], image)
+    def loadIconSets(self, iconsDir):
+        iconSets = self.getJsonData(iconsDir)
+
+        for iconSet in iconSets:
+            imagePath = iconsDir + '/' + iconSet['imagePath']
+            iconGrid = self.window.loadImage(imagePath)
+            gridX = iconSet['gridX']
+            gridY = iconSet['gridY']
+
+            # now iterate over the icon name list extracting each icon from the grid
+            curX = 0
+            for iconName in iconSet['iconNames']:
+                icon = self.window.crop(iconGrid, curX, 0, gridX, gridY)
+                curX += gridX
+
+                iconPath = 'Icon/' + iconName
+                self.cacheImage(iconPath, icon)
+                print("loaded Icon: ", iconPath)
 
     def loadDecorators(self, decoratorsDir):
         iconData = self.getJsonData(decoratorsDir)
@@ -165,7 +162,7 @@ class RuntimeContext():
         self.loadStyleSheets(assetDir + "/Images/Styles")
 
         self.iconCache = {}
-        self.loadIcons(assetDir + "/Images/Icons")
+        self.loadIconSets(assetDir + "/Images/Icons")
 
         self.decoratorCache = {}
         self.loadDecorators(assetDir + "/Images/Decorators")
@@ -205,7 +202,7 @@ class RuntimeContext():
 # Load the model
 # Startup...get the model and load the necessary assets
 # HACK! parse the path(s) from the args
-modelPath = "C:/Users/Eric Moffatt/UIRedux/FPGui/Models/DevModel.json"
+modelPath = "../Models/DevModel.json"
 with open(modelPath, 'r') as modelData:
     appModel = json.load(modelData)
 
@@ -217,6 +214,5 @@ ctx.appModel = appModel
 ctx.app = QtWidgets.QApplication(sys.argv)
 ctx.window = QTPlatform.QTPlatform(ctx)
 ctx.loadAssets() # load all assets to prepare for the paint
-ctx.perfTest(1)
-ctx.window.show() 
+ctx.window.show()
 sys.exit(ctx.app.exec_())

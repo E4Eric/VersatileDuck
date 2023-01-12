@@ -10,7 +10,7 @@ def layout(ctx, available, me):
     iconW = 0
     iconH = 0
     if 'icon' in me:
-        icon = ctx.getIcon(me['icon'])
+        icon = ctx.getIconImage(me['icon'])
         iconW = ctx.window.getImageWidth(icon)
         iconH = ctx.window.getImageHeight(icon)
 
@@ -20,9 +20,15 @@ def layout(ctx, available, me):
         textW = ctx.window.getTextWidth(me['label'], sd['fontSpec'])
         textH = ctx.window.getTextHeight(me['label'], sd['fontSpec'])
 
-    # hack! assume no icon
-    dr.w = textW
-    dr.h = max(0, textH)
+    dr.w = textW + iconW
+    dr.h = max(iconH, textH)
+
+    # put in the label gap if necessary
+    if 'label' in me:
+        if 'icon' in me:
+            if 'labelGap' in sd:
+                dr.w += sd['labelGap']
+
     me['drawRect'] = dr
 
     ctx.inflateDrawRectForStyle(me)
