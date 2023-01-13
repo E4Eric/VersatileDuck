@@ -7,14 +7,28 @@ def layout(ctx, available, me):
 
     # first layout on top
     me['drawRect'] = copy.copy(available)
+
+    height = int(available.h * pct + 0.5)
+    width = int(available.w * pct + 0.5)
     if side == 'top':
-        height = int(available.h * pct + 0.5)
         me['drawRect'].h = height
+        available.y += height
+        available.h -= height
 
     if side == 'bottom':
-        height = int(available.h * pct + 0.5)
-        me['drawRect'].y = available.y + height
+        me['drawRect'].y = (available.y + available.w) - height
         me['drawRect'].h = height
+        available.h -= height
+
+    if side == 'left':
+        me['drawRect'].w = width
+        available.x += width
+        available.w -= width
+
+    if side == 'right':
+        me['drawRect'].x = (available.x + available.w) - width
+        me['drawRect'].w = width
+        available.w -= width
 
     # drawRect set...layout the kids inside me
     # grab room for the style first since we layout inside us...
@@ -22,16 +36,5 @@ def layout(ctx, available, me):
     if 'contents' in me:
         for kid in me['contents']:
             kidAvailable = ctx.layout(kidAvailable, kid)
-
-    # Now if it's on the bottom shift it there
-    if side == 'top':
-        available.y += height
-
-    if side == 'bottom':
-        available.y = available.y + available.h - height
-        newY = available.y
-        ctx.setModelElementPos(me, me['drawRect'].x, newY)
-
-    available.h -= height
 
     return available

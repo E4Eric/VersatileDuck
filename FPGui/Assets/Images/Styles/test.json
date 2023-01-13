@@ -66,6 +66,33 @@
       "layout": "panel",
       "percentage": 100,
       "renderer": "frame"
+    },
+    "Status Line": {
+       "srcX": 400, "srcY": 50, "srcW": 48, "srcH": 48,
+       "lm": 1, "tm": 1, "rm": 1, "bm": 1,
+       "lw": 2, "th": 2, "rw": 2, "bh": 2,
+
+      "side": "bottom",
+      "layout": "tile",
+      "renderer": "frame"
+    },
+    "Part Stack": {
+       "srcX": 450, "srcY": 50, "srcW": 48, "srcH": 48,
+       "lm": 1, "tm": 1, "rm": 1, "bm": 1,
+       "lw": 2, "th": 2, "rw": 2, "bh": 2,
+
+      "percentage": "25",
+      "layout": "panel",
+      "renderer": "frame"
+    },
+    "Pytorch Project View": {
+       "srcX": 553, "srcY": 4, "srcW": 674, "srcH": 856,
+       "lm": 1, "tm": 1, "rm": 1, "bm": 1,
+       "lw": 2, "th": 2, "rw": 2, "bh": 2,
+
+      "percentage": "100",
+      "layout": "panel",
+      "renderer": "fake view"
     }
   }
 }

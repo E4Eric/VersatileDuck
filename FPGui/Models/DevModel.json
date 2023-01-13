@@ -79,6 +79,15 @@
       ]
       }
       ]
-    }
+    },
+    { "style": "Status Line", "contents": [
+          { "style": "Menu Item", "label": "Current Model Element:" }
+    ]},
+    { "style": "Part Stack", "side": "left", "percentage": 25, "contents": [
+          { "style": "Pytorch Project View", "side": "top", "percentage": 100 }
+    ]},
+    { "style": "Part Stack", "side": "right", "percentage": 25, "contents": [
+          { "style": "Menu Item", "label": "Navigate" }
+    ]}
   ]
 }
