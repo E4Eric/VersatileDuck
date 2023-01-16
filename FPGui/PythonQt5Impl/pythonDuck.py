@@ -202,7 +202,7 @@ class RuntimeContext():
 # Load the model
 # Startup...get the model and load the necessary assets
 # HACK! parse the path(s) from the args
-modelPath = "../Models/DevModel.json"
+modelPath = "../Models/EclipseDarkDuck.json"
 with open(modelPath, 'r') as modelData:
     appModel = json.load(modelData)
 

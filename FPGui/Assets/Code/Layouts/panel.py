@@ -16,7 +16,7 @@ def layout(ctx, available, me):
         available.h -= height
 
     if side == 'bottom':
-        me['drawRect'].y = (available.y + available.w) - height
+        me['drawRect'].y = (available.y + available.h) - height
         me['drawRect'].h = height
         available.h -= height
 

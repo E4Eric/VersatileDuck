@@ -126,3 +126,42 @@ class QTPlatform(QtWidgets.QWidget):
     def crop(self, srcMap, x, y, w, h):
         return srcMap.copy(QRect(x, y, w, h))
 
+    def keyPressEvent(self, event):
+        sd = self.ctx.getStyleData('Menu Item')
+        if event.key() == Qt.Key_L:
+            sd['lm'] += 1
+            print('lm: ', sd['lm'], " rm: ", sd['rm'])
+            self.updateGeometry()
+            size = self.size()
+            available = R(0,0, size.width(), size.height())
+            self.ctx.layout(available, self.ctx.appModel)
+            self.update()
+
+        if event.key() == Qt.Key_K:
+            sd['lm'] -= 1
+            print('lm: ', sd['lm'], " rm: ", sd['rm'])
+            self.updateGeometry()
+            size = self.size()
+            available = R(0,0, size.width(), size.height())
+            self.ctx.layout(available, self.ctx.appModel)
+            self.update()
+
+        if event.key() == Qt.Key_E:
+            sd['rm'] -= 1
+            print('lm: ', sd['lm'], " rm: ", sd['rm'])
+            self.updateGeometry()
+            size = self.size()
+            available = R(0,0, size.width(), size.height())
+            self.ctx.layout(available, self.ctx.appModel)
+            self.update()
+
+        if event.key() == Qt.Key_R:
+            sd['rm'] += 1
+            print('lm: ', sd['lm'], " rm: " , sd['rm'])
+            self.updateGeometry()
+            size = self.size()
+            available = R(0,0, size.width(), size.height())
+            self.ctx.layout(available, self.ctx.appModel)
+            self.update()
+
+
