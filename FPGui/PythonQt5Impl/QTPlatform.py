@@ -17,10 +17,14 @@ class R():
 
 class QTPlatform(QtWidgets.QWidget):
     def __init__(self, ctx):
+        super().__init__()
+
         self.ctx = ctx
         self.fontCache = {}
         self.painter = None
-        super().__init__()
+
+        self.setMouseTracking(True)
+        self.setGeometry(100, 100, 1200, 750)
         print("init !!")
 
     def resizeEvent(self, event):
@@ -127,7 +131,7 @@ class QTPlatform(QtWidgets.QWidget):
         return srcMap.copy(QRect(x, y, w, h))
 
     def keyPressEvent(self, event):
-        sd = self.ctx.getStyleData('Menu Item')
+        sd = self.ctx.getStyleData('Part (Selected)')
         if event.key() == Qt.Key_L:
             sd['lm'] += 1
             print('lm: ', sd['lm'], " rm: ", sd['rm'])
@@ -164,4 +168,18 @@ class QTPlatform(QtWidgets.QWidget):
             self.ctx.layout(available, self.ctx.appModel)
             self.update()
 
+        if event.key() == Qt.Key_D:
+            self.ctx.appModel["curStyleSheet"] = "Eclipse Dark"
+            available = R(0, 0, self.rect().width(), self.rect().height())
+            self.ctx.layout(available, self.ctx.appModel)
+            self.update()
+
+        if event.key() == Qt.Key_S:
+            self.ctx.appModel["curStyleSheet"] = "Eclipse Light"
+            available = R(0, 0, self.rect().width(), self.rect().height())
+            self.ctx.layout(available, self.ctx.appModel)
+            self.update()
+
+    def mouseMoveEvent(self, event):
+        print("Mouse Move")
 

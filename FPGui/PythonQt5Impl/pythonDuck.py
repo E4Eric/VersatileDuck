@@ -85,9 +85,11 @@ class RuntimeContext():
     def loadIconSets(self, iconsDir):
         iconSets = self.getJsonData(iconsDir)
 
+        self.getStyleImage("Transparent Color")
         for iconSet in iconSets:
             imagePath = iconsDir + '/' + iconSet['imagePath']
             iconGrid = self.window.loadImage(imagePath)
+            self.window.setTransparentColor(iconGrid, 81, 86, 88)
             gridX = iconSet['gridX']
             gridY = iconSet['gridY']
 
@@ -202,7 +204,9 @@ class RuntimeContext():
 # Load the model
 # Startup...get the model and load the necessary assets
 # HACK! parse the path(s) from the args
-modelPath = "../Models/EclipseDarkDuck.json"
+
+# filename = sys.argv[1]
+modelPath = "../Models/EclipseDuck.json"
 with open(modelPath, 'r') as modelData:
     appModel = json.load(modelData)
 
