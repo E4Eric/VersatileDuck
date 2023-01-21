@@ -20,9 +20,16 @@ def layout(ctx, available, me):
         totalHeight = 0
         startWidth = kidAvailable.w
         startX = kidAvailable.x
+
+        spacer = None
         for kid in me['contents']:
+            # right adjustment
+            if kid['style'] == 'spacer':
+                spacer = kid
+                continue
+
             kidAvailable = ctx.layout(kidAvailable, kid)
-            if kidAvailable.w < 0:  # Ooops...overflow, wrap
+            if kidAvailable.w < 0:  # ..overflow, wrap
                 kidAvailable.x = startX
                 kidAvailable.w = startWidth
                 kidAvailable.y += maxHeight
@@ -34,6 +41,16 @@ def layout(ctx, available, me):
             maxHeight = max(maxHeight, kid['drawRect'].h)
 
         totalHeight += maxHeight
+
+        if spacer != None:
+            dx = 0
+            for kid in me['contents']:
+                if kid['style'] == 'spacer':
+                    dx = kidAvailable.w
+                    continue
+
+                if dx > 0:
+                    ctx.offsetModelElement(kid, dx, 0)
 
         # here we need to only change the height for the style
         styleData = ctx.getStyleData(me['style'])

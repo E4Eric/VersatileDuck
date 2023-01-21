@@ -84,7 +84,13 @@
     ]},
     { "style": "Part Stack", "side": "left", "percentage": 25, "contents": [
         { "style": "Menu Bar", "side": "top", "contents": [
-              { "style": "Part (Active)",  "icon": "Run","label": "Package Explorer" }
+              { "style": "Part (Active)",  "icon": "Run","label": "Package Explorer" },
+              { "style": "spacer" },
+              { "style": "Tool Bar", "contents": [
+                  { "style": "Tool Item", "icon": "Collapse All" },
+                  { "style": "Tool Item", "icon": "Link With Editor" }
+                ]
+              }
         ]},
       { "style": "Eclipse Project View", "side": "top", "percentage": 100 }
     ]},
@@ -93,7 +99,12 @@
               { "style": "Part (Selected)",  "icon": "Search","label": "Problems" },
               { "style": "Part",  "icon": "Run","label": "Console" },
               { "style": "Part",  "icon": "Search","label": "Javadoc" },
-              { "style": "Part",  "icon": "Search","label": "Declaration" }
+              { "style": "Part",  "icon": "Search","label": "Declaration" },
+              { "style": "spacer" },
+              { "style": "Tool Bar", "contents": [
+                  { "style": "Tool Item", "icon": "Filters..." }
+                ]
+              }
         ]},
       { "style": "Eclipse Problems View", "side": "top", "percentage": 100 }
     ]},
@@ -101,7 +112,17 @@
         { "style": "Menu Bar", "contents": [
               { "style": "Part",  "icon": "Search","label": "Search" },
               { "style": "Part (Selected)",  "icon": "Run","label": "Outline" },
-              { "style": "Part",  "icon": "Search","label": "Variables" }
+              { "style": "Part",  "icon": "Search","label": "Variables" },
+              { "style": "spacer" },
+              { "style": "Tool Bar", "contents": [
+                  { "style": "Tool Item", "icon": "Collapse All" },
+                  { "style": "Tool Item", "icon": "Sort" },
+                  { "style": "Tool Item", "icon": "Hide Fields" },
+                  { "style": "Tool Item", "icon": "Hide Statics" },
+                  { "style": "Tool Item", "icon": "Hide Privates" },
+                  { "style": "Tool Item", "icon": "Hide Locals" }
+                ]
+              }
         ]},
       { "style": "Eclipse Outline View", "side": "top", "percentage": 100 }
     ]},

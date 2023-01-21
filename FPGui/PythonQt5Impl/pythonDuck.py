@@ -88,20 +88,26 @@ class RuntimeContext():
         self.getStyleImage("Transparent Color")
         for iconSet in iconSets:
             imagePath = iconsDir + '/' + iconSet['imagePath']
-            iconGrid = self.window.loadImage(imagePath)
-            self.window.setTransparentColor(iconGrid, 81, 86, 88)
-            gridX = iconSet['gridX']
-            gridY = iconSet['gridY']
+            iconSrc = self.window.loadImage(imagePath)
 
-            # now iterate over the icon name list extracting each icon from the grid
-            curX = 0
-            for iconName in iconSet['iconNames']:
-                icon = self.window.crop(iconGrid, curX, 0, gridX, gridY)
-                curX += gridX
+            # HACK!! Allows me to re-use the dark icons (and checks the transparency coce...;-)
+            self.window.setTransparentColor(iconSrc, 81, 86, 88)
 
-                iconPath = 'Icon/' + iconName
-                self.cacheImage(iconPath, icon)
-                print("loaded Icon: ", iconPath)
+            setList = iconSet['iconGrids']
+            for iconGrid in setList:
+                gridImage = self.window.crop(iconSrc, iconGrid['srcX'], iconGrid['srcY'], iconGrid['srcW'], iconGrid['srcH'])
+                gridX = iconGrid['gridX']
+                gridY = iconGrid['gridY']
+
+                # now iterate over the icon name list extracting each icon from the grid
+                curX = 0
+                for iconName in iconGrid['iconNames']:
+                    icon = self.window.crop(gridImage, curX, 0, gridX, gridY)
+                    curX += gridX
+
+                    iconPath = 'Icon/' + iconName
+                    self.cacheImage(iconPath, icon)
+                    print("loaded Icon: ", iconPath)
 
     def loadDecorators(self, decoratorsDir):
         iconData = self.getJsonData(decoratorsDir)
