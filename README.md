@@ -1,6 +1,15 @@
 # VersatileDuck
 A first principals approach to a UI Toolkit. The idea is to take a few existing 
-UI's and attempt to mimic them.
+UI's and attempt to mimic them in the simplest way possible.
+
+## Caution ! This project is in early development !! Anything can change as I iterate....
+
+# Running the demo
+ - Have Python installed
+ - install json if necessary ('pip install json')
+ - Clone the repo into a new dir (I'll call it 'test')
+ - Drill down to 'test\VersatileDuck\FPGui\PythonQt5Impl' (I'll clean this up later)
+ - Run it !! 'python pythonDuck.py'
 
 # What does 'First Principals' mean in the context ?
 
