@@ -1,14 +1,14 @@
 
 
 def draw(ctx, me):
-    sd = ctx.getStyleData(me['style'])
+    sd = ctx.assetManager.getStyleData(me['style'])
 
     # Adjust the top/right for the style
     x = me['drawRect'].x + sd['lw'] + sd['rm']
     y = me['drawRect'].y + sd['th'] + sd['tm']
 
     if 'icon' in me:
-        icon = ctx.getIconImage(me['icon'])
+        icon = ctx.assetManager.getIconImage(me['icon'])
         ctx.window.drawIcon(x, y, icon)
         x += ctx.window.getImageWidth(icon)
         if 'label' in me:

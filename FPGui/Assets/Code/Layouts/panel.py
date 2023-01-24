@@ -32,9 +32,9 @@ def layout(ctx, available, me):
 
     # drawRect set...layout the kids inside me
     # grab room for the style first since we layout inside us...
-    kidAvailable = ctx.adjustAvailableForStyle(me, me['drawRect'])
+    kidAvailable = ctx.assetManager.adjustAvailableForStyle(me, me['drawRect'])
     if 'contents' in me:
         for kid in me['contents']:
-            kidAvailable = ctx.layout(kidAvailable, kid)
+            kidAvailable = ctx.assetManager.layout(kidAvailable, kid)
 
     return available

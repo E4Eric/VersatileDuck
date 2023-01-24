@@ -6,9 +6,9 @@ def layout(ctx, available, me):
         return available   # No-op
 
     me['drawRect'] = copy.copy(available)
-    sd = ctx.getStyleData(me['style'])
+    sd = ctx.assetManager.getStyleData(me['style'])
 
-    adjusted = ctx.adjustAvailableForStyle(me, available)
+    adjusted = ctx.assetManager.adjustAvailableForStyle(me, available)
     side = sd['side']
 
     # reserve the are we need for our style frame
@@ -28,13 +28,13 @@ def layout(ctx, available, me):
                 spacer = kid
                 continue
 
-            kidAvailable = ctx.layout(kidAvailable, kid)
+            kidAvailable = ctx.assetManager.layout(kidAvailable, kid)
             if kidAvailable.w < 0:  # ..overflow, wrap
                 kidAvailable.x = startX
                 kidAvailable.w = startWidth
                 kidAvailable.y += maxHeight
                 kidAvailable.h -= maxHeight
-                kidAvailable = ctx.layout(kidAvailable, kid)
+                kidAvailable = ctx.assetManager.layout(kidAvailable, kid)
                 totalHeight += maxHeight
                 maxHeight = kid['drawRect'].h
 
@@ -50,10 +50,10 @@ def layout(ctx, available, me):
                     continue
 
                 if dx > 0:
-                    ctx.offsetModelElement(kid, dx, 0)
+                    ctx.assetManager.offsetModelElement(kid, dx, 0)
 
         # here we need to only change the height for the style
-        styleData = ctx.getStyleData(me['style'])
+        styleData = ctx.assetManager.getStyleData(me['style'])
         totalHeight += styleData['th'] + styleData['tm'] + styleData['bh'] + styleData['bm']
         me['drawRect'].h = totalHeight
 
@@ -61,7 +61,7 @@ def layout(ctx, available, me):
         available.y += me['drawRect'].h
     elif side == 'bottom':
         dy = available.h - me['drawRect'].h
-        ctx.offsetModelElement(me, 0, dy)
+        ctx.assetManager.offsetModelElement(me, 0, dy)
 
     available.h -= me['drawRect'].h
 

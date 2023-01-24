@@ -2,203 +2,24 @@
 import sys, os, copy, json, importlib
 from PyQt5 import QtGui, QtWidgets
 import QTPlatform, time
+import AssetManager, UIEventProxy
 
 class RuntimeContext():
-    def getJsonData(self, srcDir):
-        print(srcDir)
-
-        jsonData = []
-        for subdir, dirs, files in os.walk(srcDir):
-            for file in files:
-                if (file.endswith('json')):
-                    jsonPath = os.path.join(subdir, file)
-                    with open(jsonPath, 'r') as myfile:
-                        jsonString = myfile.read()
-
-                    # parse file and cache the result
-                    jsonObj = json.loads(jsonString)
-                    jsonData.append(jsonObj)
-        return jsonData
-
-    def cacheImage(self, name, image):
-        self.imageCache[name] = image
-
-    def extractStyle(self, sheetName, name, spec, sheetImage):
-        # First extract the style's image from the sheet
-        styleImage = self.window.crop(sheetImage, spec['srcX'], spec['srcY'], spec['srcW'], spec['srcH'])
-
-    def loadStyleSheets(self, stylesDir):
-        styleSheetList = self.getJsonData(stylesDir)
-        for styleSheet in styleSheetList:
-            self.styleCache[styleSheet['name']] = styleSheet
-            print("Loaded Style: " + styleSheet['name'])
-            imagePath = stylesDir + '/' + styleSheet['imagePath']
-            image = self.window.loadImage(imagePath)
-            self.cacheImage('Style Sheet/' + styleSheet['name'], image)
-
-    def getStyleData(self, styleName):
-        styleSheet = self.styleCache[self.appModel['curStyleSheet']]
-        styleData = styleSheet['Styles'][styleName]
-        return styleData
-
-    def getStyleImage(self, styleName):
-        cacheName = self.appModel['curStyleSheet']
-        styleSheet = self.styleCache[self.appModel['curStyleSheet']]
-        sheetImage = self.imageCache['Style Sheet/' + styleSheet['name']]
-        style = styleSheet['Styles'][styleName]
-        styleImage = self.window.crop(sheetImage, style['srcX'], style['srcY'], style['srcW'], style['srcH'])
-        return styleImage
-
-    def getIconImage(self, iconName):
-        return self.imageCache['Icon/' + iconName]
-
-    def offsetModelElement(self, me, dx, dy):
-        me['drawRect'].x += dx
-        me['drawRect'].y += dy
-        if 'contents' in me:
-            for kid in me['contents']:
-                self.offsetModelElement(kid, dx, dy)
-
-    def setModelElementPos(self, me, newX, newY):
-        dx = newX - me['drawRect'].x
-        dy = newY - me['drawRect'].y
-        self.offsetModelElement(me, dx, dy)
-
-    def inflateDrawRectForStyle(self, me):
-        styleData = self.getStyleData((me['style']))
-        styleExtraW = styleData['lw'] + styleData['lm'] + styleData['rm'] + styleData['rw']
-        styleExtraH = styleData['th'] + styleData['tm'] + styleData['bm'] + styleData['bh']
-        me['drawRect'].w += styleExtraW
-        me['drawRect'].h += styleExtraH
-
-    def adjustAvailableForStyle(self, me, available):
-        styleData = self.getStyleData((me['style']))
-
-        adjusted = copy.copy(available)
-        adjusted.x += styleData['lw'] + styleData['lm']
-        adjusted.y += styleData['th'] + styleData['tm']
-
-        adjusted.w -= styleData['lw'] + styleData['lm'] + styleData['rm'] + styleData['rw']
-        adjusted.h -= styleData['th'] + styleData['tm'] + styleData['bm'] + styleData['bh']
-        return adjusted
-
-    def loadIconSets(self, iconsDir):
-        iconSets = self.getJsonData(iconsDir)
-
-        self.getStyleImage("Transparent Color")
-        for iconSet in iconSets:
-            imagePath = iconsDir + '/' + iconSet['imagePath']
-            iconSrc = self.window.loadImage(imagePath)
-
-            # HACK!! Allows me to re-use the dark icons (and checks the transparency coce...;-)
-            self.window.setTransparentColor(iconSrc, 81, 86, 88)
-
-            setList = iconSet['iconGrids']
-            for iconGrid in setList:
-                gridImage = self.window.crop(iconSrc, iconGrid['srcX'], iconGrid['srcY'], iconGrid['srcW'], iconGrid['srcH'])
-                gridX = iconGrid['gridX']
-                gridY = iconGrid['gridY']
-
-                # now iterate over the icon name list extracting each icon from the grid
-                curX = 0
-                for iconName in iconGrid['iconNames']:
-                    icon = self.window.crop(gridImage, curX, 0, gridX, gridY)
-                    curX += gridX
-
-                    iconPath = 'Icon/' + iconName
-                    self.cacheImage(iconPath, icon)
-                    print("loaded Icon: ", iconPath)
-
-    def loadDecorators(self, decoratorsDir):
-        iconData = self.getJsonData(decoratorsDir)
-        for icon in iconData:
-            self.decoratorCache[icon['name']] = icon
-            print("loaded Decorator: ", icon['name'])
-
-    def loadLayouts(self, layoutsDir):
-        layoutData = self.getJsonData(layoutsDir)
-        sys.path.append(layoutsDir)
-        for layout in layoutData:
-            self.layoutCache[layout['name']] = layout
-            print("loaded Layout: ", layout['name'])
-            cp = layout['codePath']
-            code = importlib.import_module(cp)
-            self.codeCache[layout['name']] = code
-
-    def loadRenderers(self, renderersDir):
-        rendererData = self.getJsonData(renderersDir)
-        sys.path.append(renderersDir)
-        for renderer in rendererData:
-            self.rendererCache[renderer['name']] = renderer
-            print("loaded Renderer: ", renderer['name'])
-            cp = renderer['codePath']
-            code = importlib.import_module(cp)
-            self.codeCache[renderer['name']] = code
+    def __init__(self):
+        self.eventProxy = UIEventProxy.UIEventProxy(self)
 
     def layout(self, available, me):
-        sd = self.getStyleData((me['style']))
-        layoutName = sd['layout']
-        layoutCode = self.codeCache[layoutName]
-        available = layoutCode.layout(self, available, me)
+        start = time.perf_counter()
+        available = self.assetManager.layout(available, me)
+        end = time.perf_counter()
+        print('Laayout: ', end - start)
         return available
 
     def drawModelElement(self, me):
-        if 'drawRect' not in me:
-            return   # No-op
-
-        # auto-draw the frame if the me has a 'style' that's not already frame
-        if 'style' in me and me['style'] != 'frame':
-            rendererCode = self.codeCache['frame']
-            rendererCode.draw(self, me)
-
-        sd = self.getStyleData(me['style'])
-        rendererName = sd['renderer']
-        rendererCode = self.codeCache[rendererName]
-        rendererCode.draw(self, me)
-        if 'contents' in me:
-            for kid in me['contents']:
-                self.drawModelElement(kid)
-
-    def loadAssets(self):
-        assetDir = self.appModel['assetDir']
-
-        # Image-based assets
-        self.imageCache = {}
-        self.codeCache = {}
-
-        self.styleCache = {}
-        self.loadStyleSheets(assetDir + "/Images/Styles")
-
-        self.iconCache = {}
-        self.loadIconSets(assetDir + "/Images/Icons")
-
-        self.decoratorCache = {}
-        self.loadDecorators(assetDir + "/Images/Decorators")
-
-        # Code-based assets
-        self.layoutCache = {}
-        self.loadLayouts(assetDir + "/Code/Layouts")
-
-        self.rendererCache = {}
-        self.loadRenderers(assetDir + "/Code/Renderers")
-
-    def perfTest(self, duration):
         start = time.perf_counter()
-        print('start Perf test')
-
-        count = 0
-        while True:
-            curtime = time.perf_counter()
-            if curtime - start > 1:
-                break
-
-            self.x = 0
-            self.y = 0
-            self.w = 10000
-            self.h = 10000
-            self.layout(self, self.appModel)
-            count += 1
-        print('Done !! ', count)
+        self.assetManager.drawModelElement(me)
+        end = time.perf_counter()
+        print('Drawt: ', end - start)
 
     def startup(self):
         self.app = QtWidgets.QApplication(sys.argv) 
@@ -223,6 +44,6 @@ ctx.appModel = appModel
 # ...time to load the assets (NOTE: from here on *always* use the context)
 ctx.app = QtWidgets.QApplication(sys.argv)
 ctx.window = QTPlatform.QTPlatform(ctx)
-ctx.loadAssets() # load all assets to prepare for the paint
+ctx.assetManager = AssetManager.AssetManager(ctx)
 ctx.window.show()
 sys.exit(ctx.app.exec_())

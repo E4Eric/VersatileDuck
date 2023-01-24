@@ -12,15 +12,15 @@ def layout(ctx, available, me):
     maxHeight = 0
 
     # reserve space now to get positioning correct
-    kidAvailable = ctx.adjustAvailableForStyle(me, available)
+    kidAvailable = ctx.assetManager.adjustAvailableForStyle(me, available)
     for kid in me['contents']:
-        kidAvailable = ctx.layout(kidAvailable, kid)
+        kidAvailable = ctx.assetManager.layout(kidAvailable, kid)
         totalWidth += kid['drawRect'].w
         maxHeight = max(maxHeight, kid['drawRect'].h)
 
     me['drawRect'].w = totalWidth
     me['drawRect'].h = maxHeight
-    ctx.inflateDrawRectForStyle(me)
+    ctx.assetManager.inflateDrawRectForStyle(me)
 
     available.x += me['drawRect'].w
     available.w -= me['drawRect'].w

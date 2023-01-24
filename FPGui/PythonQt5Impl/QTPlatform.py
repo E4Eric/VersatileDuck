@@ -131,43 +131,6 @@ class QTPlatform(QtWidgets.QWidget):
         return srcMap.copy(QRect(x, y, w, h))
 
     def keyPressEvent(self, event):
-        sd = self.ctx.getStyleData('Part (Selected)')
-        if event.key() == Qt.Key_L:
-            sd['lm'] += 1
-            print('lm: ', sd['lm'], " rm: ", sd['rm'])
-            self.updateGeometry()
-            size = self.size()
-            available = R(0,0, size.width(), size.height())
-            self.ctx.layout(available, self.ctx.appModel)
-            self.update()
-
-        if event.key() == Qt.Key_K:
-            sd['lm'] -= 1
-            print('lm: ', sd['lm'], " rm: ", sd['rm'])
-            self.updateGeometry()
-            size = self.size()
-            available = R(0,0, size.width(), size.height())
-            self.ctx.layout(available, self.ctx.appModel)
-            self.update()
-
-        if event.key() == Qt.Key_E:
-            sd['rm'] -= 1
-            print('lm: ', sd['lm'], " rm: ", sd['rm'])
-            self.updateGeometry()
-            size = self.size()
-            available = R(0,0, size.width(), size.height())
-            self.ctx.layout(available, self.ctx.appModel)
-            self.update()
-
-        if event.key() == Qt.Key_R:
-            sd['rm'] += 1
-            print('lm: ', sd['lm'], " rm: " , sd['rm'])
-            self.updateGeometry()
-            size = self.size()
-            available = R(0,0, size.width(), size.height())
-            self.ctx.layout(available, self.ctx.appModel)
-            self.update()
-
         if event.key() == Qt.Key_D:
             self.ctx.appModel["curStyleSheet"] = "Eclipse Dark"
             available = R(0, 0, self.rect().width(), self.rect().height())
@@ -181,5 +144,21 @@ class QTPlatform(QtWidgets.QWidget):
             self.update()
 
     def mouseMoveEvent(self, event):
-        print("Mouse Move")
+        self.ctx.eventProxy.mouseMove(event.x(), event.y())
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+           self.ctx.eventProxy.mousePressEvent("left")
+        if event.button() == Qt.RightButton:
+           self.ctx.eventProxy.mousePressEvent("right")
+        if event.button() == Qt.MidButton:
+           self.ctx.eventProxy.mousePressEvent("middle")
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+           self.ctx.eventProxy.mouseReleaseEvent("left")
+        if event.button() == Qt.RightButton:
+           self.ctx.eventProxy.mouseReleaseEvent("right")
+        if event.button() == Qt.MidButton:
+           self.ctx.eventProxy.mouseReleaseEvent("middle")
 

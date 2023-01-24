@@ -1,12 +1,12 @@
 
 
 def draw(ctx, me):
-    styleImage = ctx.getStyleImage(me['style'])
+    styleImage = ctx.assetManager.getStyleImage(me['style'])
     srcW = ctx.window.getImageWidth(styleImage)
     srcH = ctx.window.getImageHeight(styleImage)
 
     # extract the frame's parameters for convenience
-    styleData = ctx.getStyleData(me['style'])
+    styleData = ctx.assetManager.getStyleData(me['style'])
     th = styleData['th']
     lw = styleData['lw']
     bh = styleData['bh']

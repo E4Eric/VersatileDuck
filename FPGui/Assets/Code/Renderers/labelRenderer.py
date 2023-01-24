@@ -1,7 +1,7 @@
 
 
 def draw(ctx, me):
-    sd = ctx.getStyleData(me['style'])
+    sd = ctx.assetManager.getStyleData(me['style'])
 
     # Adjust the top/right for the style
     x = me['drawRect'].x + sd['lw'] + sd['lm']

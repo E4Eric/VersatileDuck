@@ -3,14 +3,14 @@ import copy
 
 def layout(ctx, available, me):
     dr = copy.copy(available)
-    sd = ctx.getStyleData(me['style'])
+    sd = ctx.assetManager.getStyleData(me['style'])
 
     # Hack!! assume horizontal, no icon and a three pixel 'gap'
 
     iconW = 0
     iconH = 0
     if 'icon' in me:
-        icon = ctx.getIconImage(me['icon'])
+        icon = ctx.assetManager.getIconImage(me['icon'])
         iconW = ctx.window.getImageWidth(icon)
         iconH = ctx.window.getImageHeight(icon)
 
@@ -31,7 +31,7 @@ def layout(ctx, available, me):
 
     me['drawRect'] = dr
 
-    ctx.inflateDrawRectForStyle(me)
+    ctx.assetManager.inflateDrawRectForStyle(me)
     available.x += me['drawRect'].w
     available.w -= me['drawRect'].w
 
